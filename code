@@ -1,0 +1,268 @@
+#include<iostream>
+#include<fstream>
+#include<string>
+#include<regex>
+#include<cstdio>
+using namespace std;
+
+class PhoneBook 
+{
+public:
+	std::string name[20];
+	int no;
+	std::string con[20];
+	int total;
+	std::string contact;
+	bool flag;
+	//class constructor
+	PhoneBook()
+	{
+		int i = 0;
+		std::string line;
+		std::ifstream myfile("PhoneBook.txt");
+		while (std::getline(myfile, line))
+			i++;
+		total = i;
+		flag = true;
+		cout << "\ntotal=" << total<<"\n";
+	}
+//*****************************************************************************************************//
+	void validateNo(string phoneNo)
+	{
+		flag = true;
+		regex a("^\\d{5}$");
+		regex b("^\\(\\d{3}\\)\\d{3}-\\d{4}$");
+		regex c("^\\d{3}-\\d{4}$");
+		regex d("^\\d{3}\\s\\d{3}\\s\\d{3}\\s\\d{4}$");
+		regex e("^\\d{5}.\\d{5}$");
+		regex f("^\\d{3}\\s\\d{1}\\s\\d{3}\\s\\d{3}\\s\\d{4}$");
+		regex g("^\\d{3}\\s\\d{1}\\s\\d{3}\\s\\d{3}\\s\\d{4}$");
+		regex h("^\\d{1}\\(\\d{3}\\)\\d{3}-\\d{4}$");
+		regex i("^\\+\\d{2}\\s\\(\\d{2}\\)\\s\\d{3}-\\d{4}$");
+		regex j("^\\+\\d\\(\\d{3}\\)\\d{3}\\-\\d{4}$");
+		if (regex_search(phoneNo, a)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, b)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, c)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, d)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, e)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, f)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, g)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, h)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, i)) cout << "\nphone no. accepted";
+		else if (regex_search(phoneNo, j)) cout << "\nphone no. accepted";
+		else {
+			cout << "\nPhone no. rejected";
+			flag = false;
+		}
+	}
+
+
+//*****************************************************************************************************//
+	void validateName(string name)
+	{
+		flag = true;
+		regex A("^([a-zA-Z])+$");
+		regex B("^[a-zA-Z]+(((\'|-|.)?([a-zA-Z])+))?$");
+		regex C("^[a-zA-Z]+((\\s)?((\'|-|.)?([a-zA-Z])+))*$");
+		regex D("^[a-zA-Z]+((\\s)?([a-zA-Z])+)*$");
+		regex E("^([a-zA-Z]+[\\s'.]?)+\\S$");
+		regex F("^[a-zA-Z]+(((\\,(\\s)|-|.)?([a-zA-Z])+))*$");
+		regex G("^[a-zA-Z]+(((\\,(\\s)|-|.)?([a-zA-Z])+))+((\\s)?([a-zA-Z])+)*$");
+		if (regex_search(name, A)) cout << "\nName Accepted";
+		else if (regex_search(name, B)) cout << "\nName Accepted";
+		else if (regex_search(name, C)) cout << "\nName Accepted";
+		else if (regex_search(name, D)) cout << "\nName Accepted";
+		else if (regex_search(name, E)) cout << "\nName Accepted";
+		else if (regex_search(name, F)) cout << "\nName Accepted";
+		else if (regex_search(name, G)) cout << "\nName Accepted";
+		else {
+			cout << "\nName Rejected";
+			flag = false;
+		}
+	}
+//*****************************************************************************************************//
+	void add() 
+	{
+		std::ofstream outf;
+		cout << "\nhow many contacts do you want to store?    :  ";
+		cin >> no;
+		outf.open("PhoneBook.txt", std::ofstream::out | std::ofstream::app);
+		int no_count = 0;
+
+		for (int i = 0; i < no; i++)
+		{
+			cout << "\nname:";
+			std::getline(std::cin >> std::ws, name[i]);
+			cout << "\ncontact:";
+			std::getline(std::cin >> std::ws, con[i]);
+			validateNo(con[i]);
+			validateName(name[i]);
+			if (flag == true) 
+			{
+				no_count++;
+				//cout << "\ncontact" << con[i];
+				cout << "\n";
+				outf <<name[i] << "\n"; 
+				outf << con[i]<<" ";
+				total = total + no_count;
+				
+			}
+			else
+			{
+				cout << "\nInvalid contact\nCANNOT BE SAVED";
+				exit(0);
+			}
+		}
+		
+	}
+//***********************************************************************************************************//
+	void show() 
+	{
+		std::ifstream fin;
+		fin.open("PhoneBook.txt");
+		char ch;
+		cout << "\nPHONEBOOK";
+		for (int i = 0; i < total; i++)
+		{
+			fin >> name[i];
+			cout <<"\nName: "<<name[i] <<"\nContact: ";
+			fin >> con[i];
+			cout << con[i];
+		}
+		
+		fin.close();
+	}
+//**********************************************************************************************************************************//
+	void Remove() 
+	{
+		string Rem_name;
+		int ch;
+		cout << "\nHow do you want to delete?\n1.By name \n2.By number? \n=>";
+		cin >> ch;
+		switch (ch)
+		{
+			case 1: 
+				{
+					cout << "THIS IS A REMOVE BY NAME OPTION. Please enter name whose details you want to delete:\n";
+					std::getline(std::cin >> std::ws, Rem_name);
+					ifstream myfile;
+					ofstream temp;
+					myfile.open("PhoneBook.txt");
+					temp.open("temp.txt");
+					char ch;
+					string store;
+					int count = 0;
+					for (int i = 0; i < total; i++)
+					{
+						myfile >> con[i];
+						myfile >> name[i];
+						if (Rem_name != name[i])
+						{
+							temp << "\n" << name[i] << "\t\t\t";
+							temp << con[i];
+							count++;
+						}
+						else
+						{
+							store = name[i];
+						}
+					}
+					total = count;
+
+					cout << "\nThe record with the name " << store << " has been deleted if it exsisted" << endl;
+					myfile.close();
+					temp.close();
+					remove("PhoneBook.txt");
+					rename("temp.txt", "PhoneBook.txt");
+					break;
+				}
+		
+			case 2:
+				{
+					cout << "THIS IS A REMOVE BY NUMBER OPTION. Please enter contact you want to delete:\n";
+					std::getline(std::cin >> std::ws, contact);
+					ifstream myfile;
+					ofstream temp;
+					myfile.open("PhoneBook.txt");
+					temp.open("temp.txt");
+					char ch;
+					string store;
+					int count = 0;
+					for (int i = 0; i < total; i++)
+					{
+						myfile >> con[i];
+						myfile >> name[i];
+						if (con[i] != contact)
+						{
+							temp <<"\n"<< name[i] << "\t\t\t";
+							temp << con[i];
+							count++;
+						}
+						else
+						{
+							store = name[i];
+						}
+					}
+					total = count;
+
+					cout << "\nThe record with the name " << store << " has been deleted if it exsisted" << endl;
+					myfile.close();
+					temp.close();
+					remove("PhoneBook.txt");
+					rename("temp.txt", "PhoneBook.txt");
+					break;
+				}
+			default:
+				{
+					cout << "\nINVALID CHOICE";
+					break;
+				}
+		
+		
+		}//end of switch-case
+	}//end of add function
+
+}; //end of class PhoneBook
+
+int main()
+{
+	int choice;
+	string cont;
+	PhoneBook p;
+	do
+	{
+		cout << "\nenter your choice:\n1.Show contact Details \n2.Add contacts \n3.delete contact \n->";
+		cin >> choice;
+		switch (choice)
+
+		{
+			case 1:
+			{
+				p.show();
+				break;
+			}
+			case 2:
+			{
+				p.add();
+				break;
+			}
+			case 3:
+			{
+				p.Remove();
+				break;
+			}
+			default:
+			{
+				cout << "\nINVALID ENTRY";
+				break;
+			}
+
+		}
+
+		cout << "\nDo you want to continue with the menu?(y/n)";
+		cin >> cont;
+
+	} while ((cont == "y") || (cont == "Y"));
+
+	exit(0);
+}
